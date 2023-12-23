@@ -11,7 +11,5 @@ data class User(
     val password: String,
     val salt: String,
 
-    val userData: UserData,
-
     val id: ID = UUID.randomUUID().toString()
 )
