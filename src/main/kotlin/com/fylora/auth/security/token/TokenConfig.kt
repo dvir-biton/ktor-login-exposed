@@ -1,4 +1,4 @@
-package com.fylora.security.token
+package com.fylora.auth.security.token
 
 data class TokenConfig(
     val issuer: String,

@@ -9,8 +9,8 @@ import com.fylora.auth.requests.AuthResponse
 import com.fylora.auth.security.hashing.HashingService
 import com.fylora.auth.security.hashing.SaltedHash
 import com.fylora.auth.security.token.TokenClaim
-import com.fylora.security.token.TokenConfig
-import com.fylora.security.token.TokenService
+import com.fylora.auth.security.token.TokenConfig
+import com.fylora.auth.security.token.TokenService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -18,6 +18,9 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+
+const val MAX_USERNAME_LENGTH = 24
+const val MIN_USERNAME_LENGTH = 3
 
 fun Route.signUp(
     hashingService: HashingService,
@@ -29,10 +32,17 @@ fun Route.signUp(
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        if(request.username.length < 3) {
+        if(request.username.length < MIN_USERNAME_LENGTH) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The username cannot be less than 3 characters"
+                message = "The username cannot be less than $MIN_USERNAME_LENGTH characters"
+            )
+            return@post
+        }
+        if(request.username.length > MAX_USERNAME_LENGTH) {
+            call.respond(
+                HttpStatusCode.Conflict,
+                message = "The username cannot be more than $MAX_USERNAME_LENGTH characters"
             )
             return@post
         }
@@ -43,10 +53,11 @@ fun Route.signUp(
             )
             return@post
         }
-        if(!isStrongPassword(request.password)) {
+        val checkPassword = isStrongPassword(request.password)
+        if(!checkPassword.first) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The password is not strong enough"
+                message = checkPassword.second
             )
             return@post
         }
@@ -75,13 +86,13 @@ fun Route.signUp(
     }
 }
 
-fun Route.signIn(
+fun Route.login(
     hashingService: HashingService,
     userDao: UserDao,
     tokenService: TokenService,
     tokenConfig: TokenConfig
 ) {
-    post("signin") {
+    post("login") {
         val request = call.receiveNullable<AuthRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest)
             return@post
@@ -116,6 +127,10 @@ fun Route.signIn(
             TokenClaim(
                 name = "userId",
                 value = user.id
+            ),
+            TokenClaim(
+                name = "username",
+                value = user.username
             )
         )
         call.respond(
@@ -140,12 +155,17 @@ fun Route.getUserInfo() {
         get("info") {
             val principal = call.principal<JWTPrincipal>()
             val userId = principal?.getClaim("userId", String::class)
-            call.respond(HttpStatusCode.OK, "Your id is $userId")
+            val username = principal?.getClaim("username", String::class)
+            call.respond(
+                HttpStatusCode.OK,
+                "id: $userId\n" +
+                "username: $username"
+            )
         }
     }
 }
 
-fun isStrongPassword(password: String): Boolean {
+fun isStrongPassword(password: String): Pair<Boolean, String> {
     val minLength = 8
     val hasUpperCase = password.any {
         it.isUpperCase()
@@ -159,10 +179,28 @@ fun isStrongPassword(password: String): Boolean {
     val hasSpecialChar = password.any {
         it.isLetterOrDigit().not()
     }
+    val requirements = listOf(
+        "at least $minLength characters" to (password.length >= minLength),
+        "an uppercase letter" to hasUpperCase,
+        "a lowercase letter" to hasLowerCase,
+        "a digit" to hasDigit,
+        "a special character" to hasSpecialChar
+    )
+    val missingRequirements = requirements.filterNot { it.second }.map { it.first }
 
-    return password.length >= minLength
-            && hasUpperCase
-            && hasLowerCase
-            && hasDigit
-            && hasSpecialChar
+    return if (missingRequirements.isEmpty()) {
+        Pair(true, "Your password is strong")
+    } else {
+        if(missingRequirements.size == 1) {
+            Pair(
+                false,
+                "Your password also need to contain ${missingRequirements.lastOrNull() ?: ""}"
+            )
+        } else {
+            Pair(
+                false,
+                "Your password also need to contain ${missingRequirements.dropLast(1).joinToString(", ")}, and ${missingRequirements.lastOrNull() ?: ""}."
+            )
+        }
+    }
 }

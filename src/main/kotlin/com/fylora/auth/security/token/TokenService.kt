@@ -1,6 +1,4 @@
-package com.fylora.security.token
-
-import com.fylora.auth.security.token.TokenClaim
+package com.fylora.auth.security.token
 
 interface TokenService {
     fun generate(

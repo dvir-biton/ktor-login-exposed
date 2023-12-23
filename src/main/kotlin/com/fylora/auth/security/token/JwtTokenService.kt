@@ -1,8 +1,7 @@
-package com.fylora.security.token
+package com.fylora.auth.security.token
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.fylora.auth.security.token.TokenClaim
 import java.util.*
 
 class JwtTokenService: TokenService {

@@ -2,7 +2,7 @@ package com.fylora.auth.security
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.fylora.security.token.TokenConfig
+import com.fylora.auth.security.token.TokenConfig
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

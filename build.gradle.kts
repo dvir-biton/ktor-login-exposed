@@ -4,6 +4,7 @@ val logback_version: String by project
 val exposed_version: String by project
 val h2_version: String by project
 val commons_codec_version: String by project
+val postgre_sql_version: String by project
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -41,4 +42,5 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
     implementation("commons-codec:commons-codec:$commons_codec_version")
+    implementation("org.postgresql:postgresql:$postgre_sql_version")
 }
