@@ -1,7 +1,8 @@
 package com.fylora.auth.data.local.database
 
-import com.fylora.auth.data.model.UserDataTable
-import com.fylora.auth.data.model.UserTable
+import com.fylora.auth.data.tables.UserDataTable
+import com.fylora.auth.data.tables.UserTable
+import com.fylora.auth.logging.table.LogTable
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -18,7 +19,7 @@ object DatabaseFactory {
         val database = Database.connect(jdbcURL, driverClassName, user, password)
 
         transaction(database) {
-            SchemaUtils.create(UserTable, UserDataTable)
+            SchemaUtils.create(UserTable, UserDataTable, LogTable)
         }
     }
 

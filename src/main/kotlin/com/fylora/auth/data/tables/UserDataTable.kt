@@ -1,4 +1,4 @@
-package com.fylora.auth.data.model
+package com.fylora.auth.data.tables
 
 import org.jetbrains.exposed.sql.Table
 

@@ -2,8 +2,9 @@ package com.fylora.auth.routes
 
 import com.fylora.auth.data.local.dao.CombinedUserDao
 import com.fylora.auth.data.local.dao.UserDao
-import com.fylora.auth.data.model.User
-import com.fylora.auth.data.model.UserData
+import com.fylora.auth.data.entities.UserEntity
+import com.fylora.auth.data.entities.UserDataEntity
+import com.fylora.auth.data.entities.util.UserRole
 import com.fylora.auth.requests.AuthRequest
 import com.fylora.auth.requests.AuthResponse
 import com.fylora.auth.security.hashing.HashingService
@@ -63,17 +64,18 @@ fun Route.signUp(
         }
 
         val saltedHash = hashingService.generateSaltedHash(request.password)
-        val user = User(
+        val userEntity = UserEntity(
             username = request.username,
             password = saltedHash.hash,
-            salt = saltedHash.salt
+            salt = saltedHash.salt,
+            role = UserRole.User.type
         )
-        val userData = UserData(
+        val userDataEntity = UserDataEntity(
             fullName = request.username,
             amountOfMoney = 0
         )
 
-        val wasAcknowledged = combinedUserDao.insertUser(user, userData)
+        val wasAcknowledged = combinedUserDao.insertUser(userEntity, userDataEntity)
         if(!wasAcknowledged) {
             call.respond(
                 HttpStatusCode.Conflict,

@@ -4,6 +4,8 @@ import com.fylora.auth.data.local.dao.impl.CombinedUserDaoImpl
 import com.fylora.auth.data.local.dao.impl.UserDaoImpl
 import com.fylora.auth.data.local.dao.impl.UserDataDaoImpl
 import com.fylora.auth.data.local.database.DatabaseFactory
+import com.fylora.auth.logging.dao.LogDaoImpl
+import com.fylora.auth.routes.admin.configureAdminRouting
 import com.fylora.auth.routes.configureAuthRouting
 import com.fylora.auth.security.configureSecurity
 import com.fylora.auth.security.hashing.SHA256HashingService
@@ -25,9 +27,11 @@ fun Application.authModule() {
     val hashingService = SHA256HashingService()
     val userDao = UserDaoImpl()
     val userDataDao = UserDataDaoImpl()
-    val combinedUserDao = CombinedUserDaoImpl(userDao, userDataDao)
+    val logDao = LogDaoImpl()
+    val combinedUserDao = CombinedUserDaoImpl(userDao, userDataDao, logDao)
 
     DatabaseFactory.init()
     configureSecurity(tokenConfig)
     configureAuthRouting(hashingService, userDao, combinedUserDao, tokenService, tokenConfig)
+    configureAdminRouting(hashingService, userDao, combinedUserDao, logDao)
 }

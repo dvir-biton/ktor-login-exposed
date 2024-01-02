@@ -1,12 +1,13 @@
 package com.fylora.auth.data.local.dao
 
-import com.fylora.auth.data.model.ID
-import com.fylora.auth.data.model.User
-import com.fylora.auth.data.model.UserData
+import com.fylora.auth.data.entities.ID
+import com.fylora.auth.data.entities.UserEntity
+import com.fylora.auth.data.entities.UserDataEntity
 
 interface CombinedUserDao {
-    suspend fun insertUser(user: User, userData: UserData): Boolean
-    suspend fun updateUser(id: ID, user: User, userData: UserData): Boolean
-    suspend fun getUserWithDetailsById(id: ID): Pair<User, UserData>?
-    suspend fun getUserWithDetailsByUsername(username: String): Pair<User, UserData>?
+    suspend fun insertUser(userEntity: UserEntity, userDataEntity: UserDataEntity): Boolean
+    suspend fun updateUser(userEntity: UserEntity, userDataEntity: UserDataEntity): Boolean
+    suspend fun getUserWithDetailsById(id: ID): Pair<UserEntity, UserDataEntity>?
+    suspend fun getUserWithDetailsByUsername(username: String): Pair<UserEntity, UserDataEntity>?
+    suspend fun runCustomQuery(query: String): String
 }

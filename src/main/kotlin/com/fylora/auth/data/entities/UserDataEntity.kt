@@ -1,10 +1,11 @@
-package com.fylora.auth.data.model
+package com.fylora.auth.data.entities
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserData(
+data class UserDataEntity(
     val fullName: String,
     val amountOfMoney: Long,
+
     val id: ID? = null,
 )
