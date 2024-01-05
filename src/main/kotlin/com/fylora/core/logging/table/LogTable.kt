@@ -1,4 +1,4 @@
-package com.fylora.auth.logging.table
+package com.fylora.core.logging.table
 
 import org.jetbrains.exposed.sql.Table
 

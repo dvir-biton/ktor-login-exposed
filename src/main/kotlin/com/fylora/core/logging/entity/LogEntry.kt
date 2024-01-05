@@ -1,4 +1,4 @@
-package com.fylora.auth.logging.entity
+package com.fylora.core.logging.entity
 
 import kotlinx.serialization.Serializable
 

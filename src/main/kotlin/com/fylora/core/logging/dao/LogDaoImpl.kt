@@ -1,8 +1,8 @@
-package com.fylora.auth.logging.dao
+package com.fylora.core.logging.dao
 
 import com.fylora.auth.data.local.database.DatabaseFactory
-import com.fylora.auth.logging.entity.LogEntry
-import com.fylora.auth.logging.table.LogTable
+import com.fylora.core.logging.entity.LogEntry
+import com.fylora.core.logging.table.LogTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.insert

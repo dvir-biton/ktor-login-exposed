@@ -2,7 +2,7 @@ package com.fylora.auth.data.local.database
 
 import com.fylora.auth.data.tables.UserDataTable
 import com.fylora.auth.data.tables.UserTable
-import com.fylora.auth.logging.table.LogTable
+import com.fylora.core.logging.table.LogTable
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils

@@ -1,4 +1,4 @@
-package com.fylora.auth.logging.util
+package com.fylora.core.logging.util
 
 sealed class LogLevel(val type: String) {
     data object Info: LogLevel("info")

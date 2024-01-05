@@ -5,12 +5,13 @@ import com.fylora.auth.data.entities.UserEntity
 import com.fylora.auth.data.entities.util.UserRole
 import com.fylora.auth.data.local.dao.CombinedUserDao
 import com.fylora.auth.data.local.dao.UserDao
-import com.fylora.auth.logging.dao.LogDao
+import com.fylora.core.logging.dao.LogDao
 import com.fylora.auth.requests.admin.AdminRequest
 import com.fylora.auth.requests.admin.AdminSignUpRequest
 import com.fylora.auth.requests.admin.util.AdminAction
 import com.fylora.auth.routes.MAX_USERNAME_LENGTH
 import com.fylora.auth.security.hashing.HashingService
+import com.fylora.core.handlers.ErrorResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -37,22 +38,22 @@ fun Route.adminSignup(
         }
         if(request.adminToken != ADMIN_TOKEN) {
             call.respond(
-                HttpStatusCode.Conflict,
-                message = "Wrong admin token, aren't you admin? ;)"
+                HttpStatusCode.Forbidden,
+                message = ErrorResponse("Wrong admin token, aren't you admin? ;)")
             )
             return@post
         }
         if(request.username.length > MAX_USERNAME_LENGTH) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The username cannot be more than $MAX_USERNAME_LENGTH characters (Max database length)"
+                message = ErrorResponse("The username cannot be more than $MAX_USERNAME_LENGTH characters (Max database length)")
             )
             return@post
         }
         if(userDao.getUserByUsername(request.username) != null) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The username is already taken, to avoid conflicts it's recommended to choose a different username"
+                message = ErrorResponse("The username is already taken, to avoid conflicts it's recommended to choose a different username")
             )
             return@post
         }
@@ -73,7 +74,7 @@ fun Route.adminSignup(
         if(!wasAcknowledged) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "Unknown error occurred, Couldn't insert user"
+                message = ErrorResponse("Unknown error occurred, Couldn't insert user")
             )
             return@post
         }
@@ -92,23 +93,23 @@ fun Route.adminPanel(
             val principal = call.principal<JWTPrincipal>()
             val userId = principal?.getClaim("userId", String::class) ?: kotlin.run {
                 call.respond(
-                    HttpStatusCode.Conflict,
-                    message = "No userId found"
+                    HttpStatusCode.Unauthorized,
+                    message = ErrorResponse("No userId found")
                 )
                 return@post
             }
             val user = userDao.getUserById(userId) ?: kotlin.run {
                 call.respond(
-                    HttpStatusCode.Conflict,
-                    message = "No user found"
+                    HttpStatusCode.Unauthorized,
+                    message = ErrorResponse("No user found")
                 )
                 return@post
             }
 
             if(UserRole.fromType(user.role) != UserRole.Admin) {
                 call.respond(
-                    HttpStatusCode.Conflict,
-                    message = "You are not an admin"
+                    HttpStatusCode.Forbidden,
+                    message = ErrorResponse("You are not an admin")
                 )
                 return@post
             }
@@ -128,7 +129,7 @@ fun Route.adminPanel(
                     if(!result) {
                         call.respond(
                             HttpStatusCode.Conflict,
-                            message = "Unknown error occurred, Couldn't create user"
+                            message = ErrorResponse("Unknown error occurred, Couldn't create user")
                         )
                         return@post
                     }
@@ -137,8 +138,8 @@ fun Route.adminPanel(
                 is AdminAction.RunSqlQuery -> {
                     if("DROP" in action.query || "DELETE" in action.query) {
                         call.respond(
-                            HttpStatusCode.Conflict,
-                            message = "No permission to make such action, please use the local database connection to make this action"
+                            HttpStatusCode.Forbidden,
+                            message = ErrorResponse("No permission to make such action, please use the local database connection to make this action")
                         )
                         return@post
                     }
@@ -152,7 +153,7 @@ fun Route.adminPanel(
                     if(!result) {
                         call.respond(
                             HttpStatusCode.Conflict,
-                            message = "Unknown error occurred, Couldn't create user"
+                            message = ErrorResponse("Unknown error occurred, Couldn't create user")
                         )
                         return@post
                     }

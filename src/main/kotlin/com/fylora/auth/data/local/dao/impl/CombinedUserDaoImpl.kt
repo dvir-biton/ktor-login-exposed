@@ -7,9 +7,9 @@ import com.fylora.auth.data.local.database.DatabaseFactory
 import com.fylora.auth.data.entities.*
 import com.fylora.auth.data.tables.UserDataTable
 import com.fylora.auth.data.tables.UserTable
-import com.fylora.auth.logging.dao.LogDao
-import com.fylora.auth.logging.entity.LogEntry
-import com.fylora.auth.logging.util.LogLevel
+import com.fylora.core.logging.dao.LogDao
+import com.fylora.core.logging.entity.LogEntry
+import com.fylora.core.logging.util.LogLevel
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement

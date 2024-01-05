@@ -12,6 +12,8 @@ import com.fylora.auth.security.hashing.SaltedHash
 import com.fylora.auth.security.token.TokenClaim
 import com.fylora.auth.security.token.TokenConfig
 import com.fylora.auth.security.token.TokenService
+import com.fylora.core.handlers.ErrorResponse
+import com.fylora.core.handlers.InfoResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -36,21 +38,21 @@ fun Route.signUp(
         if(request.username.length < MIN_USERNAME_LENGTH) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The username cannot be less than $MIN_USERNAME_LENGTH characters"
+                message = ErrorResponse("The username cannot be less than $MIN_USERNAME_LENGTH characters")
             )
             return@post
         }
         if(request.username.length > MAX_USERNAME_LENGTH) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The username cannot be more than $MAX_USERNAME_LENGTH characters"
+                message = ErrorResponse("The username cannot be more than $MAX_USERNAME_LENGTH characters")
             )
             return@post
         }
         if(userDao.getUserByUsername(request.username) != null) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "The username is already taken"
+                message = ErrorResponse("The username is already taken")
             )
             return@post
         }
@@ -58,7 +60,7 @@ fun Route.signUp(
         if(!checkPassword.first) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = checkPassword.second
+                message = ErrorResponse(checkPassword.second)
             )
             return@post
         }
@@ -79,7 +81,7 @@ fun Route.signUp(
         if(!wasAcknowledged) {
             call.respond(
                 HttpStatusCode.Conflict,
-                message = "Unknown error occurred"
+                message = ErrorResponse("Unknown error occurred")
             )
             return@post
         }
@@ -104,7 +106,7 @@ fun Route.login(
         if(user == null) {
             call.respond(
                 HttpStatusCode.Conflict,
-                "Incorrect username or password"
+                ErrorResponse("Incorrect username or password")
             )
             return@post
         }
@@ -119,7 +121,7 @@ fun Route.login(
         if(!isValidPassword) {
             call.respond(
                 HttpStatusCode.Conflict,
-                "Incorrect username or password"
+                ErrorResponse("Incorrect username or password")
             )
             return@post
         }
@@ -147,7 +149,9 @@ fun Route.login(
 fun Route.authenticate() {
     authenticate {
         get("authenticate") {
-            call.respond(HttpStatusCode.OK)
+            call.respond(
+                HttpStatusCode.OK
+            )
         }
     }
 }
@@ -160,8 +164,10 @@ fun Route.getUserInfo() {
             val username = principal?.getClaim("username", String::class)
             call.respond(
                 HttpStatusCode.OK,
-                "id: $userId\n" +
-                "username: $username"
+                InfoResponse(
+                    "id: $userId\n" +
+                    "username: $username"
+                )
             )
         }
     }

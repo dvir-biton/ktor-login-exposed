@@ -4,7 +4,7 @@ import com.fylora.auth.data.local.dao.impl.CombinedUserDaoImpl
 import com.fylora.auth.data.local.dao.impl.UserDaoImpl
 import com.fylora.auth.data.local.dao.impl.UserDataDaoImpl
 import com.fylora.auth.data.local.database.DatabaseFactory
-import com.fylora.auth.logging.dao.LogDaoImpl
+import com.fylora.core.logging.dao.LogDaoImpl
 import com.fylora.auth.routes.admin.configureAdminRouting
 import com.fylora.auth.routes.configureAuthRouting
 import com.fylora.auth.security.configureSecurity
